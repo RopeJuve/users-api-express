@@ -1,4 +1,4 @@
-import { pool } from '../db.js';
+import { findById } from '../queries/userQueries.js';
 
 export const checkUser = async (req, res, next) => {
     const { id } = req.params;
@@ -6,11 +6,11 @@ export const checkUser = async (req, res, next) => {
         return res.status(400).json({ error: "Invalid user ID" });
     }
     try {
-        const user = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-        if (user.rows.length === 0) {
+        const user = await findById(id);
+        if (user === undefined) {
             return res.status(404).json({ error: "User not found" });
         }
-        req.user = user.rows[0];
+        req.user = user;
         next();
 
     } catch (error) {
